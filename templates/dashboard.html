@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-primary">📊 Dashboard Overview</h2>
+
+    <div class="row text-center mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white shadow-sm">
+                <div class="card-body">
+                    <h5>Total Patients</h5>
+                    <h3>{{ total_patients or 0 }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-success text-white shadow-sm">
+                <div class="card-body">
+                    <h5>Total Doctors</h5>
+                    <h3>{{ total_doctors or 0 }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-info text-white shadow-sm">
+                <div class="card-body">
+                    <h5>Total Visits</h5>
+                    <h3>{{ total_visits or 0 }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-warning text-white shadow-sm">
+                <div class="card-body">
+                    <h5>Total Prescriptions</h5>
+                    <h3>{{ total_prescriptions or 0 }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mt-5 mb-3">🧾 Recent Patients</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Full Name</th>
+                <th>Gender</th>
+                <th>Phone</th>
+                <th>Last Visit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if results %}
+                {% for r in results %}
+                <tr>
+                    <td>{{ r.patient_id }}</td>
+                    <td><a href="{{ url_for('patient_detail', patient_id=r.patient_id) }}">{{ r.first_name }} {{ r.last_name }}</a></td>
+                    <td>{{ r.gender }}</td>
+                    <td>{{ r.phone }}</td>
+                    <td>{{ r.visit_date }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr><td colspan="5" class="text-center text-muted">No recent patients found</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

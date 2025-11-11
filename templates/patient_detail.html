@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4 text-primary">👁️ Patient Full Details</h2>
+
+    <!-- Patient Info -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">Personal Information</div>
+        <div class="card-body">
+            <p><strong>ID:</strong> {{ patient.patient_id }}</p>
+            <p><strong>Name:</strong> {{ patient.first_name }} {{ patient.last_name }}</p>
+            <p><strong>Gender:</strong> {{ patient.gender }}</p>
+            <p><strong>Phone:</strong> {{ patient.phone }}</p>
+            <p><strong>Email:</strong> {{ patient.email }}</p>
+            <p><strong>Address:</strong> {{ patient.home_address }}</p>
+            <p><strong>Blood Group:</strong> {{ patient.blood_group }}</p>
+            <p><strong>Genotype:</strong> {{ patient.genotype }}</p>
+            <p><strong>Registration Date:</strong> {{ patient.registration_date }}</p>
+            <p><strong>Folder Number:</strong> {{ patient.folder_number }}</p>
+            <p><strong>Folder Status:</strong> {{ patient.folder_status }}</p>
+            <p><strong>Folder Created:</strong> {{ patient.folder_date }}</p>
+        </div>
+    </div>
+
+    <!-- Medical History -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">Medical History</div>
+        <div class="card-body">
+            <p><strong>Condition:</strong> {{ patient.condition }}</p>
+            <p><strong>Diagnosis Date:</strong> {{ patient.diagnosis_date }}</p>
+            <p><strong>Under Medication:</strong> {{ patient.under_medication }}</p>
+            <p><strong>Notes:</strong> {{ patient.history_notes }}</p>
+        </div>
+    </div>
+
+    <!-- Visits & Prescriptions -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">Visits & Prescriptions</div>
+        <div class="card-body">
+            {% if visits %}
+                <table class="table table-bordered table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Visit Date</th>
+                            <th>Doctor</th>
+                            <th>Diagnosis</th>
+                            <th>Treatment</th>
+                            <th>Visual Acuity (L/R)</th>
+                            <th>IOP</th>
+                            <th>Follow-up</th>
+                            <th>Drug</th>
+                            <th>Dosage</th>
+                            <th>Duration</th>
+                            <th>Prescription Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for v in visits %}
+                        <tr>
+                            <td>{{ v.visit_date }}</td>
+                            <td>{{ v.doctor_name }} ({{ v.specialization }})</td>
+                            <td>{{ v.diagnosis }}</td>
+                            <td>{{ v.treatment }}</td>
+                            <td>{{ v.visual_acuity_left }} / {{ v.visual_acuity_right }}</td>
+                            <td>{{ v.intraocular_pressure }}</td>
+                            <td>{{ v.follow_up_date }}</td>
+                            <td>{{ v.drug_name }}</td>
+                            <td>{{ v.dosage }}</td>
+                            <td>{{ v.duration }}</td>
+                            <td>{{ v.prescription_notes }}</td>
+                            <td>
+                               <form action="{{ url_for('delete_visit', visit_id=v.visit_id, patient_id=patient.patient_id) }}" method="POST" style="display:inline;">
+                                  <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this visit?');">
+                                     Delete
+                                  </button>
+                               </form>
+
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-muted">No visits or prescriptions found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<a href="{{ url_for('delete_patient', patient_id=patient.patient_id) }}" class="btn btn-danger">
+    Delete Patient
+</a>
+
+
+
+
+{% endblock %}

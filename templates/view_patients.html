@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-primary">👥 All Registered Patients</h2>
+
+    {% if patients %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th>ID</th>
+                        <th>Full Name</th>
+                        <th>DOB</th>
+                        <th>Gender</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Blood Group</th>
+                        <th>Genotype</th>
+                        <th>Next of Kin</th>
+                        <th>Registration Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in patients %}
+                    <tr>
+                        <td>{{ p.patient_id }}</td>
+                        <td>
+                            <a href="{{ url_for('patient_detail', patient_id=p.patient_id) }}">
+                              {{ p.first_name }} {{ p.last_name }}
+                              </a>
+                         </td>
+                        <td>{{ p.dob }}</td>
+                        <td>{{ p.gender }}</td>
+                        <td>{{ p.phone }}</td>
+                        <td>{{ p.email }}</td>
+                        <td>{{ p.blood_group }}</td>
+                        <td>{{ p.genotype }}</td>
+                        <td>{{ p.next_of_kin }}</td>
+                        <td>{{ p.registration_date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="alert alert-info">No patients found in the system yet.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

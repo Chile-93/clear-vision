@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4 text-primary">➕ Add Patient Visit & Prescription</h2>
+
+  <form action="{{ url_for('add_visit') }}" method="POST" class="row g-3">
+
+    <div class="col-md-4">
+      <label class="form-label">Patient ID</label>
+      <input type="number" name="patient_id" class="form-control" required>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">Visit Date</label>
+      <input type="date" name="visit_date" class="form-control" required>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">Attending Doctor</label>
+      <select name="doctor_id" class="form-select">
+        <option value="">-- Select Doctor --</option>
+        {% for d in doctors %}
+          <option value="{{ d.doctor_id }}">{{ d.doctor_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Diagnosis</label>
+      <input type="text" name="diagnosis" class="form-control" required>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Treatment</label>
+      <input type="text" name="treatment" class="form-control">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Visual Acuity (Left)</label>
+      <input type="text" name="visual_acuity_left" class="form-control">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Visual Acuity (Right)</label>
+      <input type="text" name="visual_acuity_right" class="form-control">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Intraocular Pressure</label>
+      <input type="text" name="intraocular_pressure" class="form-control">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Follow Up Date</label>
+      <input type="date" name="follow_up_date" class="form-control">
+    </div>
+
+    <hr class="mt-4 mb-3">
+    <h4 class="text-success">💊 Prescription</h4>
+
+    <div class="col-md-6">
+      <label class="form-label">Drug Name</label>
+      <input type="text" name="drug_name" class="form-control">
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label">Dosage</label>
+      <input type="text" name="dosage" class="form-control">
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label">Duration</label>
+      <input type="text" name="duration" class="form-control">
+    </div>
+
+    <div class="col-12">
+      <label class="form-label">Prescription Notes</label>
+      <textarea name="notes" class="form-control" rows="2"></textarea>
+    </div>
+
+    <hr class="mt-4 mb-3">
+    <h4 class="text-warning">🩺 Medical History </h4>
+
+    <div class="col-md-6">
+      <label class="form-label">Condition / Illness</label>
+      <input type="text" name="condition" class="form-control">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Diagnosis Date</label>
+      <input type="date" name="diagnosis_date" class="form-control">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Under Medication (yes/no or details)</label>
+      <input type="text" name="under_medication" class="form-control">
+    </div>
+
+    <div class="col-12">
+      <label class="form-label">Medical History Notes</label>
+      <textarea name="mh_notes" class="form-control" rows="2"></textarea>
+    </div>
+
+    <div class="col-12 mt-4">
+      <button type="submit" class="btn btn-primary w-100">💾 Save Visit & Details</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
