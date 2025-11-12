@@ -1,25 +1,17 @@
 import os
-import urllib
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
+# Load environment variables from .env
 load_dotenv()
 
-DB_HOST = os.getenv("DB_HOST")
-DB_NAME = os.getenv("DB_NAME")
-DB_DRIVER = os.getenv("DB_DRIVER")
+# Get the Render PostgreSQL connection string
+DB_URL = os.getenv("DB_URL")
 
-
-odbc_str = (
-  f"DRIVER={{{DB_DRIVER}}};"
-   f"SERVER={DB_HOST};"
-   f"DATABASE={DB_NAME};"
-   "Trusted_Connection=yes;"
-)
-params = urllib.parse.quote_plus(odbc_str)
-
-engine = create_engine(f"mssql+pyodbc:///?odbc_connect={params}", pool_pre_ping=True)
+# Create SQLAlchemy engine
+engine = create_engine(DB_URL, pool_pre_ping=True)
 
 def get_engine():
     return engine
+
 
