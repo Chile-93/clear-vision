@@ -27,11 +27,13 @@ def dashboard():
 
     # To populate the recent patients table
     recent_patients_query = """
-    SELECT TOP 20 p.patient_id, p.first_name, p.last_name, p.gender, p.phone, v.visit_date
+    SELECT p.patient_id, p.first_name, p.last_name, p.gender, p.phone, v.visit_date
     FROM patients p
     LEFT JOIN visit v ON p.patient_id = v.patient_id
     ORDER BY v.visit_date DESC
+    LIMIT 20
     """
+
 
     with engine.connect() as conn:
         results = conn.execute(text(recent_patients_query)).fetchall()
