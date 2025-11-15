@@ -101,21 +101,23 @@ def patient_detail(patient_id):
         WHERE patient_id = :pid
         ORDER BY visit_date DESC
     """
+
     with engine.connect() as conn:
         rows = conn.execute(text(sql), {"pid": patient_id}).fetchall()
 
     if not rows:
         return render_template("error.html", message="Patient not found")
 
-    patient = dict(rows[0]._mapping)
-    seen = set()
-    unique_visits = []
-    for r in rows:
-        v = dict(r._mapping)
-        if v['visit_id'] not in seen:
-            seen.add(v['visit_id'])
-            unique_visits.append(v)
-    return render_template('patient_detail.html', patient=patient, visits=unique_visits)
+    # first row always contains patient info
+    patient_info = rows[0]
+
+    return render_template(
+        "patient_detail.html",
+        patient=patient_info,
+        visits=rows  # 👈 FIXED
+    )
+
+
 
 
 # Add patient
