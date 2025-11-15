@@ -217,31 +217,43 @@ def add_visit():
 def delete_patient(patient_id):
     try:
         with engine.begin() as conn:
+
+            # 1️⃣ Delete prescriptions linked to visits for this patient
             conn.execute(text("""
-                DELETE FROM prescriptions USING visits
-                WHERE prescriptions.visit_id = visits.visit_id 
-                AND visits.patient_id = :id
+                DELETE FROM prescriptions 
+                WHERE visit_id IN (
+                    SELECT visit_id FROM visit WHERE patient_id = :id
+                )
             """), {"id": patient_id})
 
-            conn.execute(text("DELETE FROM visits WHERE patient_id = :id"), {"id": patient_id})
-            conn.execute(text("DELETE FROM medical_history WHERE patient_id = :id"), {"id": patient_id})
-            conn.execute(text("DELETE FROM folder WHERE patient_id = :id"), {"id": patient_id})
+            # 2️⃣ Delete visits
+            conn.execute(text("""
+                DELETE FROM visit WHERE patient_id = :id
+            """), {"id": patient_id})
 
-            result = conn.execute(
-                text("DELETE FROM patients WHERE patient_id = :id"),
-                {"id": patient_id}
-            )
+            # 3️⃣ Delete medical history
+            conn.execute(text("""
+                DELETE FROM medical_history WHERE patient_id = :id
+            """), {"id": patient_id})
+
+            # 4️⃣ Delete folder
+            conn.execute(text("""
+                DELETE FROM folder WHERE patient_id = :id
+            """), {"id": patient_id})
+
+            # 5️⃣ Finally delete patient
+            result = conn.execute(text("""
+                DELETE FROM patients WHERE patient_id = :id
+            """), {"id": patient_id})
 
         if result.rowcount == 0:
             return render_template("error.html", message="❌ Patient not found")
 
-        return render_template(
-            "delete_success.html",
-            message="✅ Patient and all related records deleted successfully!"
-        )
+        return render_template("delete_success.html", message="✅ Patient and all related records deleted successfully!")
 
     except Exception as e:
         return render_template("error.html", message=f"❌ Error deleting patient: {e}")
+
 
 
 
