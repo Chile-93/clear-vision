@@ -216,27 +216,45 @@ def add_patient():
     return render_template('add_patient.html')
 
 
+
+
+
 # Add visit
 @app.route("/add_visit", methods=["GET", "POST"])
 def add_visit():
     if request.method == "POST":
         try:
             patient_id = request.form["patient_id"]
+
+            # Visit data
             visit_data = {k: request.form.get(k) for k in [
                 "visit_date", "doctor_id", "diagnosis", "treatment",
                 "visual_acuity_left", "visual_acuity_right",
                 "intraocular_pressure", "follow_up_date"
             ]}
+
+            # Prescription data
             presc_data = {k: request.form.get(k) for k in ["drug_name", "dosage", "duration", "notes"]}
-            mh_data = {k: request.form.get(k) for k in ["condition", "diagnosis_date", "under_medication", "mh_notes"]}
+
+            # Medical history data (FIXED HERE)
+            mh_data = {
+                "condition": request.form.get("condition"),
+                "diagnosis_date": request.form.get("diagnosis_date"),
+                "under_medication": request.form.get("under_medication"),
+                "notes": request.form.get("mh_notes")  # correct binding
+            }
 
             with engine.begin() as conn:
+
+                # 1️⃣ Insert Medical History only if ANY field is entered
                 if any(mh_data.values()):
                     conn.execute(text("""
-                        INSERT INTO medical_history (patient_id, condition, diagnosis_date, under_medication, notes)
+                        INSERT INTO medical_history 
+                        (patient_id, condition, diagnosis_date, under_medication, notes)
                         VALUES (:patient_id, :condition, :diagnosis_date, :under_medication, :notes)
                     """), {**mh_data, "patient_id": patient_id})
 
+                # 2️⃣ Insert Visit
                 visit_result = conn.execute(text("""
                     INSERT INTO visit (
                         patient_id, doctor_id, visit_date, diagnosis, treatment,
@@ -248,22 +266,38 @@ def add_visit():
                     )
                     RETURNING visit_id
                 """), {**visit_data, "patient_id": patient_id})
+
                 new_visit_id = visit_result.scalar()
 
+                # 3️⃣ Insert Prescription only if drug_name is provided
                 if presc_data["drug_name"]:
                     conn.execute(text("""
-                        INSERT INTO prescriptions (patient_id, doctor_id, visit_id, drug_name, dosage, duration, notes)
+                        INSERT INTO prescriptions 
+                        (patient_id, doctor_id, visit_id, drug_name, dosage, duration, notes)
                         VALUES (:patient_id, :doctor_id, :visit_id, :drug_name, :dosage, :duration, :notes)
-                    """), {**presc_data, "patient_id": patient_id, "doctor_id": visit_data.get("doctor_id"), "visit_id": new_visit_id})
+                    """),
+                    {
+                        **presc_data,
+                        "patient_id": patient_id,
+                        "doctor_id": visit_data.get("doctor_id"),
+                        "visit_id": new_visit_id
+                    })
 
-            return render_template("success.html", message="✅ Visit, prescription, and medical history saved successfully!", patient_id=patient_id)
+            return render_template(
+                "success.html",
+                message="✅ Visit, prescription, and medical history saved successfully!",
+                patient_id=patient_id
+            )
 
         except Exception as e:
             return render_template("error.html", message=f"❌ Error: {e}")
 
+    # GET method (load doctors)
     with engine.connect() as conn:
         doctors = conn.execute(text("SELECT doctor_id, doctor_name FROM doctor ORDER BY doctor_name")).fetchall()
+
     return render_template("add_visit.html", doctors=doctors)
+
 
 
 
